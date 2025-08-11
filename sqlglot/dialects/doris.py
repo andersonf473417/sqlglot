@@ -23,7 +23,7 @@ def _lag_lead_sql(self, expression: exp.Lag | exp.Lead) -> str:
 
 
 # Accept both DATE_TRUNC(datetime, unit) and DATE_TRUNC(unit, datetime)
-def _build_date_trunc(args: t.List[exp.Expression]) -> exp.Expression:
+def _build_date_trunc(args: List[exp.Expression]) -> exp.Expression:
     a0, a1 = seq_get(args, 0), seq_get(args, 1)
 
     def _is_unit_like(e: exp.Expression | None) -> bool:
@@ -33,7 +33,7 @@ def _build_date_trunc(args: t.List[exp.Expression]) -> exp.Expression:
         return not any(ch.isdigit() for ch in text)
 
     # Determine which argument is the unit
-    unit, this = a0, a1 if _is_unit_like(a0) else a1, a0
+    unit, this = a0, (a1 if _is_unit_like(a0) else a1)
 
     return exp.TimestampTrunc(this=this, unit=unit)
 
