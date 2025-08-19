@@ -51,7 +51,13 @@ class Validator(unittest.TestCase):
         """
         expression = self.parse_one(sql)
 
-        for read_dialect, read_sql in (read or {}).items():
+        read_dialects = read
+        if isinstance(read_dialects, str):
+            read_dialects = {read_dialects: sql}
+        elif read_dialects is None:
+            read_dialects = {}
+
+        for read_dialect, read_sql in read_dialects.items():
             with self.subTest(f"{read_dialect} -> {sql}"):
                 self.assertEqual(
                     parse_one(read_sql, read_dialect).sql(
