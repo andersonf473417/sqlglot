@@ -51,7 +51,11 @@ class Validator(unittest.TestCase):
         """
         expression = self.parse_one(sql)
 
-        for read_dialect, read_sql in (read or {}).items():
+        read = read or {}
+        if isinstance(read, str):
+            read = {self.dialect: read}
+
+        for read_dialect, read_sql in read.items():
             with self.subTest(f"{read_dialect} -> {sql}"):
                 self.assertEqual(
                     parse_one(read_sql, read_dialect).sql(
@@ -63,7 +67,11 @@ class Validator(unittest.TestCase):
                     sql,
                 )
 
-        for write_dialect, write_sql in (write or {}).items():
+        write = write or {}
+        if isinstance(write, str):
+            write = {self.dialect: write}
+
+        for write_dialect, write_sql in write.items():
             with self.subTest(f"{sql} -> {write_dialect}"):
                 if write_sql is UnsupportedError:
                     with self.assertRaises(UnsupportedError):
