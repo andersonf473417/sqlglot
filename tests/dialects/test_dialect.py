@@ -49,6 +49,11 @@ class Validator(unittest.TestCase):
             pretty (bool): prettify both read and write
             identify (bool): quote identifiers in both read and write
         """
+        if read is not None and not isinstance(read, dict):
+            raise TypeError("`read` must be a dict mapping dialects to SQL")
+        if write is not None and not isinstance(write, dict):
+            raise TypeError("`write` must be a dict mapping dialects to SQL")
+
         expression = self.parse_one(sql)
 
         for read_dialect, read_sql in (read or {}).items():
