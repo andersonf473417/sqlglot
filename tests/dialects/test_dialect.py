@@ -51,33 +51,39 @@ class Validator(unittest.TestCase):
         """
         expression = self.parse_one(sql)
 
-        for read_dialect, read_sql in (read or {}).items():
-            with self.subTest(f"{read_dialect} -> {sql}"):
-                self.assertEqual(
-                    parse_one(read_sql, read_dialect).sql(
-                        self.dialect,
-                        unsupported_level=ErrorLevel.IGNORE,
-                        pretty=pretty,
-                        identify=identify,
-                    ),
-                    sql,
-                )
-
-        for write_dialect, write_sql in (write or {}).items():
-            with self.subTest(f"{sql} -> {write_dialect}"):
-                if write_sql is UnsupportedError:
-                    with self.assertRaises(UnsupportedError):
-                        expression.sql(write_dialect, unsupported_level=ErrorLevel.RAISE)
-                else:
+        if read is not None:
+            if isinstance(read, str):
+                read = {self.dialect: read}
+            for read_dialect, read_sql in read.items():
+                with self.subTest(f"{read_dialect} -> {sql}"):
                     self.assertEqual(
-                        expression.sql(
-                            write_dialect,
+                        parse_one(read_sql, read_dialect).sql(
+                            self.dialect,
                             unsupported_level=ErrorLevel.IGNORE,
                             pretty=pretty,
                             identify=identify,
                         ),
-                        write_sql,
+                        sql,
                     )
+
+        if write is not None:
+            if isinstance(write, str):
+                write = {self.dialect: write}
+            for write_dialect, write_sql in write.items():
+                with self.subTest(f"{sql} -> {write_dialect}"):
+                    if write_sql is UnsupportedError:
+                        with self.assertRaises(UnsupportedError):
+                            expression.sql(write_dialect, unsupported_level=ErrorLevel.RAISE)
+                    else:
+                        self.assertEqual(
+                            expression.sql(
+                                write_dialect,
+                                unsupported_level=ErrorLevel.IGNORE,
+                                pretty=pretty,
+                                identify=identify,
+                            ),
+                            write_sql,
+                        )
 
 
 class TestDialect(Validator):
