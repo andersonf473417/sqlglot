@@ -107,7 +107,7 @@ def _build_type_conversion(to_type: exp.DataType.Type) -> t.Callable[[t.List], e
 def _datetime_delta_sql(name: str) -> t.Callable[[Generator, DATEΤΙΜΕ_DELTA], str]:
     def _delta_sql(self: Generator, expression: DATEΤΙΜΕ_DELTA) -> str:
         if not expression.unit:
-            return rename_func(name)(self, expression)
+            return self.func("toDateTime", expression.this)
 
         return self.func(
             name,
@@ -1229,14 +1229,10 @@ class ClickHouse(Dialect):
             return offset
 
         def strtodate_sql(self, expression: exp.StrToDate) -> str:
-            strtodate_sql = self.function_fallback_sql(expression)
-
             if not isinstance(expression.parent, exp.Cast):
-                # StrToDate returns DATEs in other dialects (eg. postgres), so
-                # this branch aims to improve the transpilation to clickhouse
-                return self.cast_sql(exp.cast(expression, "DATE"))
+                return self.func("toDateTime", self.sql(expression, "this"))
 
-            return strtodate_sql
+            return self.function_fallback_sql(expression)
 
         def cast_sql(self, expression: exp.Cast, safe_prefix: t.Optional[str] = None) -> str:
             this = expression.this
