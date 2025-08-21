@@ -1306,6 +1306,8 @@ class ClickHouse(Dialect):
             #   constraint: "Type of Map key must be a type, that can be represented by integer or
             #   String or FixedString (possibly LowCardinality) or UUID or IPv6"
             # - It's not a composite type, e.g. `Nullable(Array(...))` is not a valid type
+            # - It's not a temporal type like DateTime or Date, which should not be wrapped in Nullable
+            #   by default in this context to preserve semantics for functions like toDateTime
             parent = expression.parent
             nullable = expression.args.get("nullable")
             if nullable is True or (
@@ -1316,6 +1318,7 @@ class ClickHouse(Dialect):
                     and expression.index in (None, 0)
                 )
                 and not expression.is_type(*self.NON_NULLABLE_TYPES, check_nullable=True)
+                and not expression.is_type(exp.DataType.Type.DATE, exp.DataType.Type.DATETIME, check_nullable=True)
             ):
                 dtype = f"Nullable({dtype})"
 
