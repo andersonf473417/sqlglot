@@ -327,7 +327,6 @@ class ClickHouse(Dialect):
             "TOFLOAT32": _build_type_conversion(exp.DataType.Type.FLOAT),
             "TOFLOAT64": _build_type_conversion(exp.DataType.Type.DOUBLE),
             "TODATE": _build_type_conversion(exp.DataType.Type.DATE),
-            "TODATETIME": _build_type_conversion(exp.DataType.Type.DATETIME),
             "TODATE32": _build_type_conversion(exp.DataType.Type.DATE32),
             "TODATETIME64": _build_type_conversion(exp.DataType.Type.DATETIME64),
             "TODECIMAL32": _build_type_conversion(exp.DataType.Type.DECIMAL32),
