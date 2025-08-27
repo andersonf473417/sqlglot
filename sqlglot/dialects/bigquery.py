@@ -416,7 +416,7 @@ class BigQuery(Dialect):
     HEX_LOWERCASE = True
     FORCE_EARLY_ALIAS_REF_EXPANSION = True
     PRESERVE_ORIGINAL_NAMES = True
-    HEX_STRING_IS_INTEGER_TYPE = True
+    HEX_STRING_IS_INTEGER_TYPE = False
 
     # https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#case_sensitivity
     NORMALIZATION_STRATEGY = NormalizationStrategy.CASE_INSENSITIVE
@@ -1175,7 +1175,7 @@ class BigQuery(Dialect):
             exp.GroupConcat: lambda self, e: groupconcat_sql(
                 self, e, func_name="STRING_AGG", within_group=False
             ),
-            exp.Hex: lambda self, e: self.func("UPPER", self.func("TO_HEX", self.sql(e, "this"))),
+            exp.Hex: lambda self, e: self.hexstring_sql(e, binary_function_repr="TO_HEX"),
             exp.HexString: lambda self, e: self.hexstring_sql(e, binary_function_repr="FROM_HEX"),
             exp.If: if_sql(false_value="NULL"),
             exp.ILike: no_ilike_sql,

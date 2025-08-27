@@ -914,7 +914,7 @@ FROM READ_CSV('tests/fixtures/optimizer/tpc-h/nation.csv.gz', 'delimiter', '|') 
 
             for dialect in dialect.split(", "):
                 result = parse_and_optimize(
-                    annotate_functions, sql, dialect, schema=test_schema, dialect=dialect
+                    annotate_functions, sql, dialect=dialect, schema=test_schema
                 )
 
                 with self.subTest(title):
